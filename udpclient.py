@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 from socket import *
 
-serverName = 'ms10.csug.rochester.edu'
+serverName = 'localhost'
 serverPort = 12000
 clientSocket = socket(AF_INET, SOCK_DGRAM)
 message = raw_input('Input lowercase sentence: ')
