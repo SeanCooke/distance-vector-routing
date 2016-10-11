@@ -1,5 +1,6 @@
 #!/usr/bin/env python
-import sys
+import sys, threading
+from socket import *
 
 # getConnectedNodeWeights reads a data file of the format
 #
@@ -35,12 +36,25 @@ def getConnectedNodeWeights(dataFileLocation):
 			lineIndex += 1
 	return connectedNodeWeights
 
+class serverThread(threading.Thread):
+	def __init__(self, port):
+		threadingThread.__init(self)
+			self.port = port
+	def run(self):
+		serverSocket = socket(AF_INET, SOCK_DGRAM)
+		serverSocket.bind(('', port))
+		print 'The server is ready to receive'
+		while 1:
+			message, clientAddress = serverSocket.recvfrom(2048)
+			modifiedMessage = message.upper()
+			serverSocket.sendto(modifiedMessage, clientAddress)
+	
 def main():
 	if len(sys.argv) == 3:
 		dataFileLocation = sys.argv[1]
 		port = int(sys.argv[2])
 		connectedNodeWeights = getConnectedNodeWeights(dataFileLocation)
-		print connectedNodeWeights
+		serverThread(port).start()
 	else:
 		print 'ERROR: Invalid number of arguments'
 		
