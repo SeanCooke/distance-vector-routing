@@ -44,7 +44,7 @@ def getConnectedNodeWeights(dataFileLocation):
 	return connectedNodeWeights
 	
 def openUDPConnection(serverName, serverPort):
-	print 'Opening A UDP Connection with '+hostname':'+portNumber
+	print 'Opening A UDP Connection with '+serverName+':'+str(+serverPort)
 	clientSocket = socket(AF_INET, SOCK_DGRAM)
 	message = raw_input('Enter input: ')
 	clientSocket.sendto(message,(serverName, serverPort))
