@@ -46,7 +46,7 @@ def getConnectedNodeWeights(dataFileLocation):
 def openUDPConnection(serverName, serverPort):
 	print 'Opening A UDP Connection with '+serverName+':'+str(+serverPort)
 	clientSocket = socket(AF_INET, SOCK_DGRAM)
-	message = raw_input('Enter input: ')
+	message = raw_input('Enter a lowercase word: ')
 	clientSocket.sendto(message,(serverName, serverPort))
 	modifiedMessage, serverAddress = clientSocket.recvfrom(2048)
 	print modifiedMessage
@@ -74,8 +74,8 @@ class serverThread(threading.Thread):
 		serverSocket.bind(('', self.port))
 		while 1:
 			messageRecieved, clientAddress = serverSocket.recvfrom(2048)
-			myString = messageRecieved
-			serverSocket.sendto(myString, clientAddress)
+			messageToSend = messageRecieved.upper()
+			serverSocket.sendto(messageToSend, clientAddress)
 
 # Global Variables
 dataFileLocation = sys.argv[1]
