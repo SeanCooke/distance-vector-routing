@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-import sys, threading, time, ast
+import sys, threading, time, ast, os
 from socket import *
 
 # getConnectedNodeWeights reads a data file of the format
@@ -46,14 +46,11 @@ def getConnectedNodeWeights(dataFileLocation):
 def udpClient(serverName, serverPort):
 	print 'Opening A UDP Connection with '+serverName+':'+str(+serverPort)
 	clientSocket = socket(AF_INET, SOCK_DGRAM)
- 	# message = raw_input('Enter a lowercase word: ')
 	clientSocket.sendto(str(connectedNodeWeights),(serverName, serverPort))
-	modifiedObject, serverAddress = clientSocket.recvfrom(2048)
-	modifiedDictionary = ast.literal_eval(modifiedObject)
 	print str(modifiedDictionary)
 	clientSocket.close()
 
-class printConnectedNodeWeights(threading.Thread):
+class clientThread(threading.Thread):
 	def __init__(self, port, sequenceNumber, sleepSeconds):
 		threading.Thread.__init__(self)
 		self.port = port
@@ -95,7 +92,7 @@ def main():
 		print gethostname()+' listening on port '+str(port)
  		serverThread(port).start()
  		# Printing the current routing table at 10 second intervals
- 		printConnectedNodeWeights(port, 1, 10).start()
+ 		clientThread(port, 1, 10).start()
 	else:
 		print 'ERROR: Invalid number of arguments'
 
