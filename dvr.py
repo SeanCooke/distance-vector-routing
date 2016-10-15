@@ -60,6 +60,9 @@ class printConnectedNodeWeights(threading.Thread):
 		self.sleepSeconds = sleepSeconds
 	def run(self):
 		while 1:
+	 		# Sending connectedNodeWeights to all connected nodes
+	 		for key, value in connectedNodeWeights.iteritems():
+	 			udpClient(key, port)
 			print '## '+str(self.sequenceNumber)
 			for key, value in connectedNodeWeights.iteritems():
 				print 'shortest path to node '+key+' the next hop is '+value['nextHop']+' and the cost is '+str(value['cost'])
@@ -91,9 +94,6 @@ def main():
  		serverThread(port).start()
  		# Printing the current routing table at 10 second intervals
  		printConnectedNodeWeights(1, 10).start()
- 		# Sending connectedNodeWeights to all connected nodes
- 		for key, value in connectedNodeWeights.iteritems():
- 			udpClient(key, port)
 	else:
 		print 'ERROR: Invalid number of arguments'
 
