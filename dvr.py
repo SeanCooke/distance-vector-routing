@@ -44,7 +44,6 @@ def getConnectedNodeWeights(dataFileLocation):
 	return connectedNodeWeights
 	
 def udpClient(serverName, serverPort):
-	print 'Opening A UDP Connection with '+serverName+':'+str(+serverPort)
 	clientSocket = socket(AF_INET, SOCK_DGRAM)
 	clientSocket.sendto(str(connectedNodeWeights),(serverName, serverPort))
 	clientSocket.close()
@@ -59,9 +58,8 @@ class clientThread(threading.Thread):
 		while 1:
 	 		# Sending connectedNodeWeights to all connected nodes
 	 		for key, value in connectedNodeWeights.iteritems():
-	 			print 'key: '+key+' Value: '+str(value)
 	 			udpClient(key, self.port)
-			print '## '+str(self.sequenceNumber)
+			print '\n## '+str(self.sequenceNumber)
 			for key, value in connectedNodeWeights.iteritems():
 				print 'shortest path to node '+key+' the next hop is '+value['nextHop']+' and the cost is '+str(value['cost'])
 			time.sleep(self.sleepSeconds)
