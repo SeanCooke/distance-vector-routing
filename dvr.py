@@ -54,15 +54,17 @@ def udpClient(serverName, serverPort):
 	clientSocket.close()
 
 class printConnectedNodeWeights(threading.Thread):
-	def __init__(self, sequenceNumber, sleepSeconds):
+	def __init__(self, port, sequenceNumber, sleepSeconds):
 		threading.Thread.__init__(self)
+		self.port = port
 		self.sequenceNumber = sequenceNumber
 		self.sleepSeconds = sleepSeconds
 	def run(self):
 		while 1:
 	 		# Sending connectedNodeWeights to all connected nodes
 	 		for key, value in connectedNodeWeights.iteritems():
-	 			udpClient(key, port)
+	 			print 'key: '+key+' Value: '+str(value)
+	 			udpClient(key, self.port)
 			print '## '+str(self.sequenceNumber)
 			for key, value in connectedNodeWeights.iteritems():
 				print 'shortest path to node '+key+' the next hop is '+value['nextHop']+' and the cost is '+str(value['cost'])
@@ -93,7 +95,7 @@ def main():
 		print gethostname()+' listening on port '+str(port)
  		serverThread(port).start()
  		# Printing the current routing table at 10 second intervals
- 		printConnectedNodeWeights(1, 10).start()
+ 		printConnectedNodeWeights(port, 1, 10).start()
 	else:
 		print 'ERROR: Invalid number of arguments'
 
