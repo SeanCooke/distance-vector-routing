@@ -76,7 +76,6 @@ class serverThread(threading.Thread):
 			objectRecieved, clientAddress = serverSocket.recvfrom(2048)
 			dictionaryRecieved = ast.literal_eval(objectRecieved)
 			dictionaryRecieved['KEY_BY_'+gethostname()] = {'nextHop':'NEXT_HOP_BY_'+gethostname(), 'cost':999.0}
-			print 'dictionaryRecieved: '+str(dictionaryRecieved)
 
 # Global Variables
 dataFileLocation = sys.argv[1]
