@@ -76,7 +76,7 @@ class serverThread(threading.Thread):
 		while 1:
 			objectRecieved, clientAddress = serverSocket.recvfrom(2048)
 			dictionaryRecieved = ast.literal_eval(objectRecieved)
-			dictionaryRecieved['KEY_BY_SERVER'] = {'nextHop':'NEXT_HOP_BY_SERVER', 'cost':999.0}
+			dictionaryRecieved['KEY_BY_'+gethostname()] = {'nextHop':'NEXT_HOP_BY_'+gethostname(), 'cost':999.0}
 			serverSocket.sendto(str(dictionaryRecieved), clientAddress)
 
 # Global Variables
