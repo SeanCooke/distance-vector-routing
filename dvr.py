@@ -90,11 +90,8 @@ def updateRoutingTable(distanceVectorDictionaryReceived):
 				# If the host [distanceVectorHostRecieved] exists in [routingTable], see
 				# if it's less expensive to go through [distanceVectorHostRecieved]
 				if distanceVectorHostRecieved in routingTable:
-					print 'Considering '+hostRecieved+'\'s distance vector to '+distanceVectorHostRecieved
 					currentCost = routingTable[distanceVectorHostRecieved]['cost']
 					newCost = routingTable[hostRecieved]['cost'] + distanceVectorCostRecieved
-					print 'currentCost:  '+str(currentCost)
-					print 'newCost: '+str(newCost)
 					if newCost < currentCost:
 						newNextHop = routingTable[hostRecieved]['nextHop']
 						routingTable[distanceVectorHostRecieved] = {'nextHop':newNextHop, 'cost':newCost}
