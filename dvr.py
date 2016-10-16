@@ -104,9 +104,6 @@ class serverThread(threading.Thread):
 		while 1:
 			objectRecieved, clientAddress = serverSocket.recvfrom(2048)
 			dictionaryRecieved = ast.literal_eval(objectRecieved)
-			print '-----'
-			print 'dictionaryRecieved: '+str(dictionaryRecieved)
-			print '-----'
 			updateRoutingTable(dictionaryRecieved)
 
 # Global Variables
