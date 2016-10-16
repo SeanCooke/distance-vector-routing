@@ -79,7 +79,7 @@ def updateRoutingTable(distanceVectorDictionaryReceived):
 	# hostRecieved will hold the host from which this distance vector was sent
 	hostRecieved = distanceVectorDictionaryReceived.pop('host', None)
 	print "\n*****"
-	print "Host Received: "+hostRecieved
+	print "Host Received: "+str(hostRecieved)
 	print "Distance Vector Received: "+str(distanceVectorDictionaryReceived)
 	print "Initial Routing Table: "+str(routingTable)
 	# Only listen to hosts to which route exists in [routingTable]
