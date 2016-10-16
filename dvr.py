@@ -72,14 +72,14 @@ class clientThread(threading.Thread):
 			self.sequenceNumber += 1
 			
 def updateRoutingTable(dictionaryRecieved):
+	print '\n***********'
+	print 'Function actually called'
+	print '***********\n'
 	# hostRecieved will hold the host from which this routing table was sent
 	hostRecieved = dictionaryRecieved.pop('host', None)
 	# Only listen to hosts to which route exists in [routingTable]
 	if hostRecieved in routingTable:
 		for keyRecieved, valueRecieved in dictionaryRecieved:
-			print '\n***********'
-			print 'Got to the for loop'
-			print '***********\n'
 			# If the host [keyRecieved] exists in [routingTable], see
 			# if it's less expensive to go through [hostRecieved]
 			if keyRecieved in routingTable:
