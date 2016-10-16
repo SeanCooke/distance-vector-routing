@@ -72,7 +72,7 @@ class clientThread(threading.Thread):
 	 		# Printing routing table 
 			print '\n## '+str(self.sequenceNumber)
 			for key, value in routingTable.iteritems():
-				if key != 'host' and key != gethostname():
+				if key != 'host':
 					print 'shortest path to node '+key+': the next hop is '+value['nextHop']+' and the cost is '+str(value['cost'])
 			time.sleep(self.sleepSeconds)
 			self.sequenceNumber += 1
@@ -87,7 +87,7 @@ def updateRoutingTable(distanceVectorDictionaryReceived):
 	# Only listen to hosts to which route exists in [routingTable]
 	if hostRecieved in routingTable:
 		for distanceVectorHostRecieved, distanceVectorCostRecieved in distanceVectorDictionaryReceived.iteritems():
-			if distanceVectorHostRecieved != 'host':
+			if distanceVectorHostRecieved != 'host' and distanceVectorHostRecieved != gethostname():
 				# If the host [distanceVectorHostRecieved] exists in [routingTable], see
 				# if it's less expensive to go through [distanceVectorHostRecieved]
 				if distanceVectorHostRecieved in routingTable:
