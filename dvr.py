@@ -71,7 +71,7 @@ class clientThread(threading.Thread):
 			time.sleep(self.sleepSeconds)
 			self.sequenceNumber += 1
 			
-def updatedistanceVector(dictionaryRecieved):
+def updateDistanceVector(dictionaryRecieved):
 	# hostRecieved will hold the host from which this routing table was sent
 	hostRecieved = dictionaryRecieved.pop('host', None)
 	print '\n***********'
@@ -79,7 +79,7 @@ def updatedistanceVector(dictionaryRecieved):
 	print '***********\n'
 	# Only listen to hosts to which route exists in [distanceVector]
 	if hostRecieved in distanceVector:
-		for keyRecieved, valueRecieved in dictionaryRecieved:
+		for keyRecieved, valueRecieved in dictionaryRecieved.iteritems():
 			# If the host [keyRecieved] exists in [distanceVector], see
 			# if it's less expensive to go through [hostRecieved]
 			if keyRecieved in distanceVector:
@@ -104,7 +104,7 @@ class serverThread(threading.Thread):
 		while 1:
 			objectRecieved, clientAddress = serverSocket.recvfrom(2048)
 			dictionaryRecieved = ast.literal_eval(objectRecieved)
-			updatedistanceVector(dictionaryRecieved)
+			updateDistanceVector(dictionaryRecieved)
 
 # Global Variables
 dataFileLocation = sys.argv[1]
