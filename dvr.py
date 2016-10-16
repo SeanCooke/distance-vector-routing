@@ -28,7 +28,6 @@ from socket import *
 # i.e. {'host': 'smddevmysql01.urmc-sh.rochester.edu', 'smddevapche01.urmc-sh.rochester.edu': 2.0, 'smdsndphp01.urmc-sh.rochester.edu': 0.5}
 def computeDistanceVector(dataFileLocation):
 	distanceVector = {}
-	distanceVector['host'] = gethostname()
 	with open(dataFileLocation) as dataFile:
 		line = dataFile.readline()
 		lineIndex = 1
@@ -41,6 +40,7 @@ def computeDistanceVector(dataFileLocation):
 					pass
 			line = dataFile.readline()
 			lineIndex += 1
+	distanceVector['host'] = gethostname()
 	return distanceVector
 	
 def initializeRoutingTable(distanceVector):
