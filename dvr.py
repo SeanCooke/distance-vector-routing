@@ -2,7 +2,7 @@
 import sys, threading, time, ast, os
 from socket import *
 
-# getConnectedNodeWeights reads a data file of the format
+# getRoutingTable reads a data file of the format
 #
 # 3
 # b 2.0
@@ -12,23 +12,27 @@ from socket import *
 # and returns a dictionary containing the name/value pairs
 # of hostnames, next hops, and  weights.  The initial next hops
 # are the hostnames.  The initial weights are detailed on lines 2
-# through the end of [dataFileLocation].
+# through the end of [dataFileLocation].  The key/value pair
+# 'host: [gethostname()]' will be in [routingTable] to identify
+# the host from which this routing table came.
 #
 # input arguments:
 # 1. dataFileLocation - the location of a file to read
 #
 # return values:
-# 1. connectedNodeWeights - a dictionary containing the name/value
+# 1. routingTable - a dictionary containing the name/value
 # pairsof hostnames, next hops, and weights detailed on lines 2 through
-# the end of [dataFileLocation].  The value of [connectedNodeWeights]
+# the end of [dataFileLocation].  The value of [routingTable]
 # is a dictionary with keys 'nextHop' and 'cost'.  The key 'nextHop' in
-# the values of [connectedNodeWeights] holds the current next hop to
-# get to they key. The key 'cost' in the values of [connectedNodeWeights]
-# holds the cost to get to the key.
+# the values of [routingTable] holds the current next hop to
+# get to they key. The key 'cost' in the values of [routingTable]
+# holds the cost to get to the key.  The key/value pair 'host: [gethostname()]'
+# will be in [routingTable] to identify the host from which this 
+# routing table came.
 #
-# i.e. {'c': {'nextHop': 'c', 'cost': 5.0}, 'b': {'nextHop': 'b', 'cost': 2.0}, 'd': {'nextHop': 'd', 'cost': 1.0}}
-def getConnectedNodeWeights(dataFileLocation):
-	connectedNodeWeights = {}
+# i.e. {'host': 'scooke1x9lt.urmc-sh.rochester.edu','c': {'nextHop': 'c', 'cost': 5.0}, 'b': {'nextHop': 'b', 'cost': 2.0}, 'd': {'nextHop': 'd', 'cost': 1.0}}
+def getRoutingTable(dataFileLocation):
+	routingTable = {'host': gethostname()}
 	with open(dataFileLocation) as dataFile:
 		line = dataFile.readline()
 		lineIndex = 1
@@ -36,16 +40,16 @@ def getConnectedNodeWeights(dataFileLocation):
 			if lineIndex != 1:
 				lineSplit = line.split()
 				try:
-					connectedNodeWeights[lineSplit[0]] = {'nextHop':lineSplit[0], 'cost':float(lineSplit[1])}
+					routingTable[lineSplit[0]] = {'nextHop':lineSplit[0], 'cost':float(lineSplit[1])}
 				except IndexError:
 					pass
 			line = dataFile.readline()
 			lineIndex += 1
-	return connectedNodeWeights
+	return routingTable
 	
 def udpClient(serverName, serverPort):
 	clientSocket = socket(AF_INET, SOCK_DGRAM)
-	clientSocket.sendto(str(connectedNodeWeights),(serverName, serverPort))
+	clientSocket.sendto(str(routingTable),(serverName, serverPort))
 	clientSocket.close()
 
 class clientThread(threading.Thread):
@@ -56,14 +60,36 @@ class clientThread(threading.Thread):
 		self.sleepSeconds = sleepSeconds
 	def run(self):
 		while 1:
-	 		# Sending connectedNodeWeights to all connected nodes
-	 		for key, value in connectedNodeWeights.iteritems():
-	 			udpClient(key, self.port)
+	 		# Sending routingTable to all connected nodes
+	 		for key, value in routingTable.iteritems():
+	 			if key != 'host':
+	 				udpClient(key, self.port)
 			print '\n## '+str(self.sequenceNumber)
-			for key, value in connectedNodeWeights.iteritems():
-				print 'shortest path to node '+key+' the next hop is '+value['nextHop']+' and the cost is '+str(value['cost'])
+			for key, value in routingTable.iteritems():
+				if key != 'host':
+					print 'shortest path to node '+key+': the next hop is '+value['nextHop']+' and the cost is '+str(value['cost'])
 			time.sleep(self.sleepSeconds)
 			self.sequenceNumber += 1
+			
+def updateRoutingTable(dictionaryRecieved):
+	# hostRecieved will hold the host from which this routing table was sent
+	hostRecieved = dictionaryRecieved.pop('host', None)
+	# Only listen to hosts to which route exists in [routingTable]
+	if hostRecieved in routingTable:
+		for keyRecieved, valueRecieved in dictionaryRecieved:
+			# If the host [keyRecieved] exists in [routingTable], see
+			# if it's less expensive to go through [hostRecieved]
+			if keyRecieved in routingTable:
+				currentCost = routingTable[keyRecieved]['cost']
+				newCost = routingTable[hostRecieved]['cost'] + valueRecieved['cost']
+				if newCost < currentCost:
+					routingTable[keyRecieved] = {'nextHop':hostRecieved, 'cost':newCost}
+			# Otherwise, add [keyRecieved] to [routingTable]
+			# by going through [hostRecieved]
+			else:
+				newCost = routingTable[hostRecieved]['cost'] + valueRecieved['cost']			
+				routingTable[keyRecieved] = {'nextHop':hostRecieved, 'cost':newCost}
+			
 
 class serverThread(threading.Thread):
 	def __init__(self, port):
@@ -75,11 +101,11 @@ class serverThread(threading.Thread):
 		while 1:
 			objectRecieved, clientAddress = serverSocket.recvfrom(2048)
 			dictionaryRecieved = ast.literal_eval(objectRecieved)
-			dictionaryRecieved['KEY_BY_'+gethostname()] = {'nextHop':'NEXT_HOP_BY_'+gethostname(), 'cost':999.0}
+			updateRoutingTable(dictionaryRecieved)
 
 # Global Variables
 dataFileLocation = sys.argv[1]
-connectedNodeWeights = getConnectedNodeWeights(dataFileLocation)
+routingTable = getRoutingTable(dataFileLocation)
 
 def main():
 	if len(sys.argv) == 3:
