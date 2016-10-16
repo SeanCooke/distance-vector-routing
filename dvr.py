@@ -11,7 +11,7 @@ from socket import *
 #
 # and returns a dictionary containing the name/value pairs
 # of hostnames and and  weights.  The key/value pair
-# 'host: [gethostname()]' will be in [distanceVector] to identify
+# 'host: [hostname]' will be in [distanceVector] to identify
 # the host from which this distance vector came.
 #
 # input arguments:
@@ -22,13 +22,13 @@ from socket import *
 # pairs of hostnames and weights detailed on lines 2 through
 # the end of [dataFileLocation].  The values of [distanceVector]
 # are the costs to the directly connected hosts.  The key/value pair
-# 'host: [gethostname()]' will be in [distanceVector] to identify
+# 'host: [hostname]' will be in [distanceVector] to identify
 # the host from which this distance vector came.
 #
 # i.e. {'host': 'smddevmysql01.urmc-sh.rochester.edu', 'smddevapche01.urmc-sh.rochester.edu': 2.0, 'smdsndphp01.urmc-sh.rochester.edu': 0.5}
 def computeDistanceVector(dataFileLocation):
 	distanceVector = {}
-	distanceVector['host'] = gethostname()
+	distanceVector['host'] = hostname
 	with open(dataFileLocation) as dataFile:
 		line = dataFile.readline()
 		lineIndex = 1
@@ -87,10 +87,11 @@ def updateRoutingTable(distanceVectorDictionaryReceived):
 	# Only listen to hosts to which route exists in [routingTable]
 	if hostRecieved in routingTable:
 		for distanceVectorHostRecieved, distanceVectorCostRecieved in distanceVectorDictionaryReceived.iteritems():
-			if distanceVectorHostRecieved != 'host' and distanceVectorHostRecieved != gethostname():
+			if distanceVectorHostRecieved != 'host' and distanceVectorHostRecieved != hostname:
 				# If the host [distanceVectorHostRecieved] exists in [routingTable], see
 				# if it's less expensive to go through [distanceVectorHostRecieved]
 				if distanceVectorHostRecieved in routingTable:
+					'WE GOT HERE!'
 					currentCost = routingTable[distanceVectorHostRecieved]['cost']
 					newCost = routingTable[hostRecieved]['cost'] + distanceVectorCostRecieved
 					if newCost < currentCost:
@@ -102,7 +103,6 @@ def updateRoutingTable(distanceVectorDictionaryReceived):
 					newCost = routingTable[hostRecieved]['cost'] + distanceVectorCostRecieved
 					newNextHop = routingTable[hostRecieved]['nextHop']
 					routingTable[distanceVectorHostRecieved] = {'nextHop':newNextHop, 'cost':newCost}
-	print "Final Routing Table: "+str(routingTable)
 	print "*****\n"
 
 class serverThread(threading.Thread):
@@ -122,12 +122,13 @@ dataFileLocation = sys.argv[1]
 distanceVector = computeDistanceVector(dataFileLocation)
 # routingTable is initialized with information from distanceVector
 routingTable = initializeRoutingTable(distanceVector)
+hostname = gethostname()
 
 def main():
 	if len(sys.argv) == 3:
 		port = int(sys.argv[2])
 		# Listening on user specified port for incomming UDP connections
-		print gethostname()+' listening on port '+str(port)
+		print hostname+' listening on port '+str(port)
  		serverThread(port).start()
  		# Printing the current routing table at 10 second intervals
  		clientThread(port, 1, 10).start()
