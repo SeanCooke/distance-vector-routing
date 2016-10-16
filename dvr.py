@@ -79,29 +79,29 @@ class clientThread(threading.Thread):
 			
 def updateRoutingTable(distanceVectorDictionaryReceived):
 	# hostRecieved will hold the host from which this distance vector was sent
+	hostRecieved = distanceVectorDictionaryReceived.['host']
 	print "\n*****"
 	print "Distance Vector Received: "+str(distanceVectorDictionaryReceived)
-	hostRecieved = distanceVectorDictionaryReceived.pop('host', None)
 	print "Host Received: "+str(hostRecieved)
-	print "Distance Vector Received After Pop: "+str(distanceVectorDictionaryReceived)
 	print "Initial Routing Table: "+str(routingTable)
 	# Only listen to hosts to which route exists in [routingTable]
 	if hostRecieved in routingTable:
 		for distanceVectorHostRecieved, distanceVectorCostRecieved in distanceVectorDictionaryReceived.iteritems():
-			# If the host [distanceVectorHostRecieved] exists in [routingTable], see
-			# if it's less expensive to go through [distanceVectorHostRecieved]
-			if distanceVectorHostRecieved in routingTable:
-				currentCost = routingTable[distanceVectorHostRecieved]['cost']
-				newCost = routingTable[hostRecieved]['cost'] + distanceVectorCostRecieved
-				if newCost < currentCost:
+			if distanceVectorHostRecieved != 'host':
+				# If the host [distanceVectorHostRecieved] exists in [routingTable], see
+				# if it's less expensive to go through [distanceVectorHostRecieved]
+				if distanceVectorHostRecieved in routingTable:
+					currentCost = routingTable[distanceVectorHostRecieved]['cost']
+					newCost = routingTable[hostRecieved]['cost'] + distanceVectorCostRecieved
+					if newCost < currentCost:
+						newNextHop = routingTable[hostRecieved]['nextHop']
+						routingTable[distanceVectorHostRecieved] = {'nextHop':newNextHop, 'cost':newCost}
+				# Otherwise, add [keyRecieved] to [distanceVector]
+				# by going through [hostRecieved]
+				else:
+					newCost = routingTable[hostRecieved]['cost'] + distanceVectorCostRecieved
 					newNextHop = routingTable[hostRecieved]['nextHop']
 					routingTable[distanceVectorHostRecieved] = {'nextHop':newNextHop, 'cost':newCost}
-			# Otherwise, add [keyRecieved] to [distanceVector]
-			# by going through [hostRecieved]
-			else:
-				newCost = routingTable[hostRecieved]['cost'] + distanceVectorCostRecieved
-				newNextHop = routingTable[hostRecieved]['nextHop']
-				routingTable[distanceVectorHostRecieved] = {'nextHop':newNextHop, 'cost':newCost}
 	print "Final Routing Table: "+str(routingTable)
 	print "*****\n"
 
