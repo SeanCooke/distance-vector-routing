@@ -28,6 +28,7 @@ from socket import *
 # i.e. {'host': 'smddevmysql01.urmc-sh.rochester.edu', 'smddevapche01.urmc-sh.rochester.edu': 2.0, 'smdsndphp01.urmc-sh.rochester.edu': 0.5}
 def computeDistanceVector(dataFileLocation):
 	distanceVector = {}
+	distanceVector['host'] = gethostname()
 	with open(dataFileLocation) as dataFile:
 		line = dataFile.readline()
 		lineIndex = 1
@@ -40,14 +41,14 @@ def computeDistanceVector(dataFileLocation):
 					pass
 			line = dataFile.readline()
 			lineIndex += 1
-	distanceVector['host'] = gethostname()
 	return distanceVector
 	
 def initializeRoutingTable(distanceVector):
 	routingTable = {}
-	routingTable['host'] = distanceVector.pop('host', None)
+	routingTable['host'] = distanceVector['host']
 	for distanceVectorHost, distanceVectorCost in distanceVector.iteritems():
-		routingTable[distanceVectorHost] = {'nextHop':distanceVectorHost, 'cost':distanceVectorCost}
+		if distanceVectorHost != 'host':
+			routingTable[distanceVectorHost] = {'nextHop':distanceVectorHost, 'cost':distanceVectorCost}
 	return routingTable
 
 def udpClient(serverName, serverPort):
