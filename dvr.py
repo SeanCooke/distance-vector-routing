@@ -126,12 +126,11 @@ routingTable = initializeRoutingTable(distanceVector)
 def main():
 	if len(sys.argv) == 3:
 		port = int(sys.argv[2])
-		print 'distanceVector: '+str(distanceVector)
 		# Listening on user specified port for incomming UDP connections
-		# print gethostname()+' listening on port '+str(port)
- 		# serverThread(port).start()
+		print gethostname()+' listening on port '+str(port)
+ 		serverThread(port).start()
  		# Printing the current routing table at 10 second intervals
- 		# clientThread(port, 1, 10).start()
+ 		clientThread(port, 1, 10).start()
 	else:
 		print 'ERROR: Invalid number of arguments'
 
