@@ -91,7 +91,7 @@ def updateRoutingTable(distanceVectorDictionaryReceived):
 				# If the host [distanceVectorHostRecieved] exists in [routingTable], see
 				# if it's less expensive to go through [distanceVectorHostRecieved]
 				if distanceVectorHostRecieved in routingTable:
-					print 'Considering '+distanceVectorHostRecieved+'\'s distance vector'
+					print 'Considering '+hostRecieved+'\'s distance vector to '+distanceVectorHostRecieved
 					currentCost = routingTable[distanceVectorHostRecieved]['cost']
 					newCost = routingTable[hostRecieved]['cost'] + distanceVectorCostRecieved
 					print 'currentCost:  '+str(currentCost)
@@ -132,7 +132,7 @@ def main():
 		print hostname+' listening on port '+str(port)
  		serverThread(port).start()
  		# Printing the current routing table at 10 second intervals
- 		clientThread(port, 1, 20).start()
+ 		clientThread(port, 1, 10).start()
 	else:
 		print 'ERROR: Invalid number of arguments'
 
