@@ -76,12 +76,12 @@ class clientThread(threading.Thread):
 			self.sequenceNumber += 1
 			
 def updateRoutingTable(distanceVectorDictionaryReceived):
-	# hostRecieved will hold the host from which this distance vector was sent
-	hostRecieved = distanceVectorDictionaryReceived.pop('host', None)
-	# Only listen to hosts to which route exists in [routingTable]
 	print "\n*****"
 	print "Distance Vector Received: "+str(distanceVectorDictionaryReceived)
 	print "*****\n"
+	# hostRecieved will hold the host from which this distance vector was sent
+	hostRecieved = distanceVectorDictionaryReceived.pop('host', None)
+	# Only listen to hosts to which route exists in [routingTable]
 	if hostRecieved in routingTable:
 		for distanceVectorHostRecieved, distanceVectorCostRecieved in distanceVectorDictionaryReceived.iteritems():
 			# If the host [distanceVectorHostRecieved] exists in [routingTable], see
