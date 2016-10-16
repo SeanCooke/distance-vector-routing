@@ -79,6 +79,9 @@ def updateRoutingTable(distanceVectorDictionaryReceived):
 	# hostRecieved will hold the host from which this distance vector was sent
 	hostRecieved = distanceVectorDictionaryReceived.pop('host', None)
 	# Only listen to hosts to which route exists in [routingTable]
+	print "\n*****"
+	print "Routing Table: "+str(routingTable)
+	print "*****\n"
 	if hostRecieved in routingTable:
 		for distanceVectorHostRecieved, distanceVectorCostRecieved in distanceVectorDictionaryReceived.iteritems():
 			# If the host [distanceVectorHostRecieved] exists in [routingTable], see
@@ -106,9 +109,6 @@ class serverThread(threading.Thread):
 		serverSocket.bind(('', self.port))
 		while 1:
 			distanceVectorStringReceived, clientAddress = serverSocket.recvfrom(2048)
-			print '\n*****'
-			print 'DISTANCE VECTOR RECEIVED'
-			print '*****\n'
 			distanceVectorDictionaryReceived = ast.literal_eval(distanceVectorStringReceived)
 			updateRoutingTable(distanceVectorDictionaryReceived)
 
