@@ -2,6 +2,9 @@
 import sys, threading, time, ast, os
 from socket import *
 
+# Global Variables
+hostname = gethostname()
+
 # computeDistanceVector reads a data file of the format
 #
 # 3
@@ -122,7 +125,6 @@ dataFileLocation = sys.argv[1]
 distanceVector = computeDistanceVector(dataFileLocation)
 # routingTable is initialized with information from distanceVector
 routingTable = initializeRoutingTable(distanceVector)
-hostname = gethostname()
 
 def main():
 	if len(sys.argv) == 3:
