@@ -2,7 +2,7 @@
 import sys, threading, time, ast, os
 from socket import *
 
-# getDistanceVector reads a data file of the format
+# computeDistanceVector reads a data file of the format
 #
 # 3
 # b 2.0
@@ -10,28 +10,23 @@ from socket import *
 # d 1.0
 #
 # and returns a dictionary containing the name/value pairs
-# of hostnames, next hops, and  weights.  The initial next hops
-# are the hostnames.  The initial weights are detailed on lines 2
-# through the end of [dataFileLocation].  The key/value pair
+# of hostnames and and  weights.  The key/value pair
 # 'host: [gethostname()]' will be in [distanceVector] to identify
-# the host from which this routing table came.
+# the host from which this distance vector came.
 #
 # input arguments:
 # 1. dataFileLocation - the location of a file to read
 #
 # return values:
 # 1. distanceVector - a dictionary containing the name/value
-# pairsof hostnames, next hops, and weights detailed on lines 2 through
-# the end of [dataFileLocation].  The value of [distanceVector]
-# is a dictionary with keys 'nextHop' and 'cost'.  The key 'nextHop' in
-# the values of [distanceVector] holds the current next hop to
-# get to they key. The key 'cost' in the values of [distanceVector]
-# holds the cost to get to the key.  The key/value pair 'host: [gethostname()]'
-# will be in [distanceVector] to identify the host from which this 
-# routing table came.
+# pairs of hostnames and weights detailed on lines 2 through
+# the end of [dataFileLocation].  The values of [distanceVector]
+# are the costs to the directly connected hosts.  The key/value pair
+# 'host: [gethostname()]' will be in [distanceVector] to identify
+# the host from which this distance vector came.
 #
-# i.e. {'host': 'scooke1x9lt.urmc-sh.rochester.edu','c': {'nextHop': 'c', 'cost': 5.0}, 'b': {'nextHop': 'b', 'cost': 2.0}, 'd': {'nextHop': 'd', 'cost': 1.0}}
-def getDistanceVector(dataFileLocation):
+# i.e. {'host': 'smddevmysql01.urmc-sh.rochester.edu', 'smddevapche01.urmc-sh.rochester.edu': 2.0, 'smdsndphp01.urmc-sh.rochester.edu': 0.5}
+def computeDistanceVector(dataFileLocation):
 	distanceVector = {'host': gethostname()}
 	with open(dataFileLocation) as dataFile:
 		line = dataFile.readline()
@@ -40,13 +35,20 @@ def getDistanceVector(dataFileLocation):
 			if lineIndex != 1:
 				lineSplit = line.split()
 				try:
-					distanceVector[lineSplit[0]] = {'nextHop':lineSplit[0], 'cost':float(lineSplit[1])}
+					distanceVector[lineSplit[0]] = float(lineSplit[1])
 				except IndexError:
 					pass
 			line = dataFile.readline()
 			lineIndex += 1
 	return distanceVector
 	
+def initializeRoutingTable(distanceVector):
+	routingTable = {}
+	routingTable['host'] = distanceVector.pop('host', None)
+	for distanceVectorHost, distanceVectorCost in distanceVector.iteritems():
+		routingTable[distanceVectorHost] = {'nextHop':distanceVectorHost, 'cost':distanceVectorCost}
+	return routingTable
+
 def udpClient(serverName, serverPort):
 	clientSocket = socket(AF_INET, SOCK_DGRAM)
 	clientSocket.sendto(str(distanceVector),(serverName, serverPort))
@@ -60,38 +62,39 @@ class clientThread(threading.Thread):
 		self.sleepSeconds = sleepSeconds
 	def run(self):
 		while 1:
-	 		# Sending distanceVector to all connected nodes
+	 		# Recomputing [distanceVector] and sending it to all connected nodes
+			computeDistanceVector(dataFileLocation)
 	 		for key, value in distanceVector.iteritems():
 	 			if key != 'host':
 	 				udpClient(key, self.port)
+	 		# Printing routing table 
 			print '\n## '+str(self.sequenceNumber)
-			for key, value in distanceVector.iteritems():
+			for key, value in routingTable.iteritems():
 				if key != 'host':
 					print 'shortest path to node '+key+': the next hop is '+value['nextHop']+' and the cost is '+str(value['cost'])
 			time.sleep(self.sleepSeconds)
 			self.sequenceNumber += 1
 			
-def updateDistanceVector(dictionaryRecieved):
-	# hostRecieved will hold the host from which this routing table was sent
-	hostRecieved = dictionaryRecieved.pop('host', None)
-	print '\n***********'
-	print 'hostRecieved: '+hostRecieved
-	print '***********\n'
-	# Only listen to hosts to which route exists in [distanceVector]
-	if hostRecieved in distanceVector:
-		for keyRecieved, valueRecieved in dictionaryRecieved.iteritems():
-			# If the host [keyRecieved] exists in [distanceVector], see
-			# if it's less expensive to go through [hostRecieved]
-			if keyRecieved in distanceVector:
-				currentCost = distanceVector[keyRecieved]['cost']
-				newCost = distanceVector[hostRecieved]['cost'] + valueRecieved['cost']
+def updateRoutingTable(distanceVectorDictionaryReceived):
+	# hostRecieved will hold the host from which this distance vector was sent
+	hostRecieved = distanceVectorDictionaryReceived.pop('host', None)
+	# Only listen to hosts to which route exists in [routingTable]
+	if hostRecieved in routingTable:
+		for distanceVectorHostRecieved, distanceVectorCostRecieved in distanceVectorDictionaryReceived.iteritems():
+			# If the host [distanceVectorHostRecieved] exists in [routingTable], see
+			# if it's less expensive to go through [distanceVectorHostRecieved]
+			if distanceVectorHostRecieved in routingTable:
+				currentCost = routingTable[distanceVectorHostRecieved]['cost']
+				newCost = routingTable[hostRecieved]['cost'] + distanceVectorCostRecieved
 				if newCost < currentCost:
-					distanceVector[keyRecieved] = {'nextHop':hostRecieved, 'cost':newCost}
+					newNextHop = routingTable[hostRecieved]['nextHop']
+					routingTable[distanceVectorHostRecieved] = {'nextHop':newNextHop, 'cost':newCost}
 			# Otherwise, add [keyRecieved] to [distanceVector]
 			# by going through [hostRecieved]
 			else:
-				newCost = distanceVector[hostRecieved]['cost'] + valueRecieved['cost']			
-				distanceVector[keyRecieved] = {'nextHop':hostRecieved, 'cost':newCost}
+				newCost = routingTable[hostRecieved]['cost'] + distanceVectorCostRecieved
+				newNextHop = routingTable[hostRecieved]['nextHop']
+				routingTable[distanceVectorHostRecieved] = {'nextHop':newNextHop, 'cost':newCost}
 			
 
 class serverThread(threading.Thread):
@@ -102,13 +105,15 @@ class serverThread(threading.Thread):
 		serverSocket = socket(AF_INET, SOCK_DGRAM)
 		serverSocket.bind(('', self.port))
 		while 1:
-			objectRecieved, clientAddress = serverSocket.recvfrom(2048)
-			dictionaryRecieved = ast.literal_eval(objectRecieved)
-			updateDistanceVector(dictionaryRecieved)
+			distanceVectorStringReceived, clientAddress = serverSocket.recvfrom(2048)
+			distanceVectorDictionaryReceived = ast.literal_eval(distanceVectorStringReceived)
+			updateRoutingTable(distanceVectorDictionaryReceived)
 
 # Global Variables
 dataFileLocation = sys.argv[1]
-distanceVector = getDistanceVector(dataFileLocation)
+distanceVector = computeDistanceVector(dataFileLocation)
+# routingTable is initialized with information from distanceVector
+routingTable = initializeRoutingTable(distanceVector)
 
 def main():
 	if len(sys.argv) == 3:
