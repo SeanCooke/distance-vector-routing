@@ -27,7 +27,7 @@ from socket import *
 #
 # i.e. {'host': 'smddevmysql01.urmc-sh.rochester.edu', 'smddevapche01.urmc-sh.rochester.edu': 2.0, 'smdsndphp01.urmc-sh.rochester.edu': 0.5}
 def computeDistanceVector(dataFileLocation):
-	distanceVector = {'host': gethostname()}
+	distanceVector['host'] = gethostname()
 	with open(dataFileLocation) as dataFile:
 		line = dataFile.readline()
 		lineIndex = 1
