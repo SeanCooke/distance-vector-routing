@@ -27,7 +27,7 @@ from socket import *
 #
 # i.e. {'host': 'smddevmysql01.urmc-sh.rochester.edu', 'smddevapche01.urmc-sh.rochester.edu': 2.0, 'smdsndphp01.urmc-sh.rochester.edu': 0.5}
 def computeDistanceVector(dataFileLocation):
-	distanceVector['host'] = gethostname()
+	distanceVector = {'host': gethostname()}
 	with open(dataFileLocation) as dataFile:
 		line = dataFile.readline()
 		lineIndex = 1
@@ -77,8 +77,9 @@ class clientThread(threading.Thread):
 			
 def updateRoutingTable(distanceVectorDictionaryReceived):
 	# hostRecieved will hold the host from which this distance vector was sent
-	hostRecieved = distanceVectorDictionaryReceived.pop('host', None)
 	print "\n*****"
+	print "Host Received: "+str(hostRecieved)
+	hostRecieved = distanceVectorDictionaryReceived.pop('host', None)
 	print "Host Received: "+str(hostRecieved)
 	print "Distance Vector Received: "+str(distanceVectorDictionaryReceived)
 	print "Initial Routing Table: "+str(routingTable)
