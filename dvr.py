@@ -106,6 +106,9 @@ class serverThread(threading.Thread):
 		serverSocket.bind(('', self.port))
 		while 1:
 			distanceVectorStringReceived, clientAddress = serverSocket.recvfrom(2048)
+			print '\n*****'
+			print 'DISTANCE VECTOR RECEIVED'
+			print '*****\n'
 			distanceVectorDictionaryReceived = ast.literal_eval(distanceVectorStringReceived)
 			updateRoutingTable(distanceVectorDictionaryReceived)
 
