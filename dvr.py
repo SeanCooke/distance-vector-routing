@@ -80,7 +80,7 @@ def updateRoutingTable(distanceVectorDictionaryReceived):
 	hostRecieved = distanceVectorDictionaryReceived.pop('host', None)
 	# Only listen to hosts to which route exists in [routingTable]
 	print "\n*****"
-	print "Routing Table: "+str(routingTable)
+	print "Distance Vector Received: "+str(distanceVectorDictionaryReceived)
 	print "*****\n"
 	if hostRecieved in routingTable:
 		for distanceVectorHostRecieved, distanceVectorCostRecieved in distanceVectorDictionaryReceived.iteritems():
