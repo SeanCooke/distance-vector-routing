@@ -72,7 +72,7 @@ class clientThread(threading.Thread):
 	 		# Printing routing table 
 			print '\n## '+str(self.sequenceNumber)
 			for key, value in routingTable.iteritems():
-				if key != 'host':
+				if key != 'host' and key != gethostname():
 					print 'shortest path to node '+key+': the next hop is '+value['nextHop']+' and the cost is '+str(value['cost'])
 			time.sleep(self.sleepSeconds)
 			self.sequenceNumber += 1
