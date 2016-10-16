@@ -94,8 +94,8 @@ def updateRoutingTable(distanceVectorDictionaryReceived):
 					print 'Considering '+distanceVectorHostRecieved+'\'s distance vector'
 					currentCost = routingTable[distanceVectorHostRecieved]['cost']
 					newCost = routingTable[hostRecieved]['cost'] + distanceVectorCostRecieved
-					print 'currentCost:  '+currentCost
-					print 'newCost: '+newCost
+					print 'currentCost:  '+str(currentCost)
+					print 'newCost: '+str(newCost)
 					if newCost < currentCost:
 						newNextHop = routingTable[hostRecieved]['nextHop']
 						routingTable[distanceVectorHostRecieved] = {'nextHop':newNextHop, 'cost':newCost}
