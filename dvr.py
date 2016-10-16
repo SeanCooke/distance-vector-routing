@@ -27,7 +27,7 @@ from socket import *
 #
 # i.e. {'host': 'smddevmysql01.urmc-sh.rochester.edu', 'smddevapche01.urmc-sh.rochester.edu': 2.0, 'smdsndphp01.urmc-sh.rochester.edu': 0.5}
 def computeDistanceVector(dataFileLocation):
-	distanceVector = {'host': gethostname()}
+	global distanceVector = {'host': gethostname()}
 	with open(dataFileLocation) as dataFile:
 		line = dataFile.readline()
 		lineIndex = 1
@@ -40,7 +40,6 @@ def computeDistanceVector(dataFileLocation):
 					pass
 			line = dataFile.readline()
 			lineIndex += 1
-	return distanceVector
 	
 def initializeRoutingTable(distanceVector):
 	routingTable = {}
@@ -64,9 +63,9 @@ class clientThread(threading.Thread):
 		while 1:
 	 		# Recomputing [distanceVector] and sending it to all connected nodes
 			computeDistanceVector(dataFileLocation)
-	 		for key, value in distanceVector.iteritems():
-	 			if key != 'host':
-	 				udpClient(key, self.port)
+	 		for serverName in distanceVector:
+	 			if serverName != 'host':
+	 				udpClient(serverName, self.port)
 	 		# Printing routing table 
 			print '\n## '+str(self.sequenceNumber)
 			for key, value in routingTable.iteritems():
