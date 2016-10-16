@@ -79,7 +79,7 @@ class clientThread(threading.Thread):
 			
 def updateRoutingTable(distanceVectorDictionaryReceived):
 	# hostRecieved will hold the host from which this distance vector was sent
-	hostRecieved = distanceVectorDictionaryReceived.['host']
+	hostRecieved = distanceVectorDictionaryReceived['host']
 	print "\n*****"
 	print "Distance Vector Received: "+str(distanceVectorDictionaryReceived)
 	print "Host Received: "+str(hostRecieved)
