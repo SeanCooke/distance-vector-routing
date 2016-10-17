@@ -3,7 +3,9 @@
 [Read me on GitHub!](https://github.com/SeanCooke/distance-vector-routing)
 
 ## Commands
-BUILD COMMAND: `$ make all` RUN COMMAND: `$ ./dvr [location_of_data_file] [port_number]` CLEAN COMMAND: `$ make clean`
+BUILD COMMAND: `$ make all`
+RUN COMMAND: `$ ./dvr [location_of_data_file] [port_number]`
+CLEAN COMMAND: `$ make clean`
 
 ## About
 `dvr` is an implementation of the Distance Vector Routing protocol.  All hosts in the network __must__ be started by entering the same `[port_number]`.
