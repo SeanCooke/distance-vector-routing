@@ -4,7 +4,9 @@
 
 ## Commands
 BUILD COMMAND: `$ make all`
+
 RUN COMMAND: `$ ./dvr [location_of_data_file] [port_number]`
+
 CLEAN COMMAND: `$ make clean`
 
 ## About
