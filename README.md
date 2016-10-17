@@ -6,9 +6,9 @@
 BUILD COMMAND: `$ make all` RUN COMMAND: `$ ./dvr [location_of_data_file] [port_number]` CLEAN COMMAND: `$ make clean`
 
 ## About
-`dvr` is an implementation of the Distance Vector Routing protocol.  All nodes in the network __must__ be started by entering the same `[port_number]`.
+`dvr` is an implementation of the Distance Vector Routing protocol.  All hosts in the network __must__ be started by entering the same `[port_number]`.
 
-Every 10  seconds, each node running `dvr` sends its distance vector to all directly connected nodes.  Simultaneously, each node running `dvr` listens for incomming distance vectors.  If a better route to any node in a node's routing table can be found using this information, the routing table is updated respectively.
+Every 10  seconds, each host running `dvr` sends its distance vector to all directly connected nodes.  Simultaneously, each host running `dvr` listens for incomming distance vectors.  If a better route to any node in a host's routing table can be found, the host's routing table is updated accordingly.
 
 ## Example
 A graphical representation of the network created in the default data files `a.dat`, `b.dat`, and `c.dat` can be found [here](#)
