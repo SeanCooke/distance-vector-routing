@@ -15,7 +15,9 @@ CLEAN COMMAND: `$ make clean`
 Every 10  seconds, each host running `dvr` sends its distance vector to all directly connected nodes.  Simultaneously, each host running `dvr` listens for incomming distance vectors.  If a better route to any node in a host's routing table can be found, the host's routing table is updated accordingly.
 
 ## Example
-A graphical representation of the network created in the default data files `a.dat`, `b.dat`, and `c.dat` can be found [here](#)
+A graphical representation of the network created in the default data files `a.dat`, `b.dat`, and `c.dat` can be found in [abc-network-diagram.png](https://github.com/SeanCooke/distance-vector-routing/blob/master/abc-network-diagram.png).
+
+Initially, `a` thinks its shortest route to `b` is its direct link, though after running `dvr` on all hosts in the network, `a` realizes its shortest route to `b` is through `c`.
 
 ## The Data File
 The data file holds the number of nodes immediately connected nodes, the hostnames of the immediately connected nodes and the weights of the immediately connected vertices.  The first line __must__ contain the number of immediately connected nodes.  All subsequent lines __must__ be in the following format:
